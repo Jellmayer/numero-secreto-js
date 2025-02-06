@@ -9,13 +9,16 @@ let btnChutar = document.getElementById('chutar');
 let btnReiniciar = document.getElementById('reiniciar');
 
 let tentativas = 0;
+let listaTentativas = [];
+let totalJogos = 1;
+let totalTentativas = 0;
 
 exibirMensagemInicial();
 
 //Função que obtém um elemento do HTML e altera o texto dele
-function alterarTextoNaTag(text, tag){
+function alterarTextoNaTag(texto, tag){
     let element = document.querySelector(tag);
-    element.innerHTML = text;
+    element.innerHTML = texto;
 }
 
 function gerarNumeroSecreto(min, max){
@@ -27,19 +30,23 @@ function gerarNumeroSecreto(min, max){
 function exibirMensagemInicial(){
     alterarTextoNaTag('Jogo do Número Secreto', 'h1');
     alterarTextoNaTag(`Descubra o número secreto entre ${min} e ${max}`, 'p');
+    alterarTextoNaTag('', 'h4');
 }
 
 function verificarChute(){
     let chute = parseInt(input.value);
     if(verificarLimite()){
         tentativas++;
-        if(chute == numeroSecreto){
+        totalTentativas++;
+        if(chute == numeroSecreto){ //Usuário acertou o número secreto
+            let mensagem = tentativas == 1 ? 'Você acertou na primeira tentativa!' : `Você acertou em ${tentativas} tentativas!`;        
             alterarTextoNaTag('Parabéns!!!', 'h1');
-            let mensagemTentativas = tentativas == 1 ? 'Você acertou na primeira tentativa!' : `Você acertou em ${tentativas} tentativas!`;
-            alterarTextoNaTag(mensagemTentativas, 'p');
+            alterarTextoNaTag(mensagem, 'p');
+            listaTentativas.push(tentativas);
+            mensagemSobreTentativas(tentativas);
             btnChutar.disabled = true;
             btnReiniciar.disabled = false;
-        } else {
+        } else { //Usuário errou o número secreto
             if(chute > numeroSecreto)
                 alterarTextoNaTag(`O número secreto é menor que ${chute}`, 'p');
             else
@@ -58,8 +65,23 @@ function verificarLimite(){
     return chute >= min && chute <= max;
 }
 
+//Altera a mensagem sobre as tentativas
+function mensagemSobreTentativas(tentativa){
+    let mensagem = '';
+    if(totalJogos == 1)
+        mensagem = 'Esse foi seu primeiro jogo :)';
+    else {
+        if(tentativa == Math.min(...listaTentativas))
+            mensagem = 'Você bateu seu recorde de tentativas! Esse foi seu melhor jogo XD';
+        if(tentativa == Math.max(...listaTentativas))
+            mensagem = 'Você demorou pra acertar hein! Esse foi seu pior jogo :(';
+    }
+    alterarTextoNaTag(mensagem, 'h4');
+}
+
 //Reinicia o jogo
 function novoJogo(){
+    totalJogos++;
     numeroSecreto = gerarNumeroSecreto(min, max);
     tentativas = 0;
     chute = '';
@@ -72,4 +94,14 @@ function novoJogo(){
 function limparInput(){
     input.value = '';
     input.focus();
+}
+
+//Exibe um relatório com as tentativas
+function criarRelatório(){
+    let relatorio = `Total de jogos: ${totalJogos}\n`;
+    relatorio += `Total de tentativas: ${totalTentativas}\n`;
+    relatorio += `Média de tentativas por jogo: ${totalTentativas / totalJogos}\n`;
+    relatorio += `Maior número de tentativas em um jogo: ${Math.max(...listaTentativas)}\n`; //"..." chama-se Spread Operator, transforma cada
+    relatorio += `Menor número de tentativas em um jogo: ${Math.min(...listaTentativas)}\n`; // índice em um parâmetro.
+    alert(relatorio);
 }

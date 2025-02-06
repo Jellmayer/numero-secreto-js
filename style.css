@@ -96,12 +96,13 @@ h1 {
 }
 
 p,
+h4,
 button {
     font-family: 'Inter', sans-serif;
 }
 
 .texto__paragrafo {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 400;
 }
 
